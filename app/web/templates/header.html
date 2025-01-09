@@ -1,28 +1,39 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">Navbar</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark {% if fixed_top %}fixed-top{% endif %}">
+    <a class="navbar-brand" href="{{ url_for('index') }}">Navbar</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Головна<span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="{{ url_for('index') }}">Головна <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Намалювати</a>
+                <a class="nav-link" href="{{ url_for('draw') }}">Намалювати</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto dropleft">
-            <li class="nav-item dropdown">
-                <a class="nav-link" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
-                    <i class="fas fa-user-circle" style="font-size: 30px;"></i>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="#"><i class="fas fa-user"></i> Profile</a>
-                    <a class="dropdown-item" href="#"><i class="fas fa-cogs"></i> Settings</a>
-                    <a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Log Out</a>
-                </div>
-            </li>
+            {% if current_user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false" aria-haspopup="false">
+                        <i class="fas fa-user-circle" style="font-size: 30px;"></i>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user"></i> Profile</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-cogs"></i> Settings</a>
+                        <form method="post" action="{{ url_for('logout') }}">
+                            <button class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+                        </form>
+                    </div>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <form class="d-flex">
+                        <a class="btn btn-outline-success me-2" href="{{ url_for('login') }}" type="button">Залогініться</a>
+                        <a class="btn btn-outline-success me-2" href="{{ url_for('register') }}" type="button">Зареєструватись</a>
+                    </form>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </nav>

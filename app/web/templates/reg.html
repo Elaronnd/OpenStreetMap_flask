@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: #212529;">
   <div class="col-md-6">
-    <div class="card">
+    <div class="card bg-dark text-light">
       <div class="card-header text-center bg-custom text-black">
         <h4>Реєстрація</h4>
       </div>
@@ -12,27 +12,27 @@
           {{ form.csrf_token }}
 
           <div class="form-group">
-            {{ form.username.label }}
-            {{ form.username(class="form-control", placeholder="Введіть ім'я користувача") }}
+            {{ form.username.label(class="text-light") }}
+            {{ form.username(class="form-control bg-black", placeholder="Введіть ім'я користувача") }}
           </div>
 
           <div class="form-group">
-            {{ form.email.label }}
-            {{ form.email(class="form-control", placeholder="Введіть вашу електронну пошту") }}
+            {{ form.email.label(class="text-light") }}
+            {{ form.email(class="form-control bg-black", placeholder="Введіть вашу електронну пошту") }}
           </div>
 
           <div class="form-group">
-            {{ form.password.label }}
-            {{ form.password(class="form-control", placeholder="Введіть пароль") }}
+            {{ form.password.label(class="text-light") }}
+            {{ form.password(class="form-control bg-black", placeholder="Введіть пароль") }}
           </div>
 
           <div class="form-group text-center">
-            <input class="btn btn-success btn-block" type="submit" value="Go">
+            <input class="btn btn-success btn-block" type="submit" value="Зареєструватись">
           </div>
         </form>
       </div>
-      <div class="card-footer text-center">
-        <small>Вже маєте обліковий запис? <a href="#">Увійти</a></small>
+      <div class="card-footer text-center bg-black">
+        <small class="text-light">Вже маєте обліковий запис? <a href="{{ url_for('login') }}" class="text-success">Увійти</a></small>
       </div>
     </div>
   </div>

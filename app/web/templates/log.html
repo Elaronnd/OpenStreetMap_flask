@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: #212529;">
   <div class="col-md-6">
-    <div class="card">
+    <div class="card bg-dark text-light">
       <div class="card-header text-center bg-custom text-black">
         <h4>Вхід</h4>
       </div>
@@ -12,24 +12,25 @@
           {{ form.csrf_token }}
 
           <div class="form-group">
-            {{ form.username.label }}
-            {{ form.username(class="form-control", id="username", placeholder="Введіть ім'я користувача") }}
+            {{ form.username.label(class="text-light") }}
+            {{ form.username(class="form-control bg-black", id="username", placeholder="Введіть ім'я користувача") }}
           </div>
 
           <div class="form-group">
-            {{ form.password.label }}
-            {{ form.password(class="form-control", id="password", placeholder="Введіть пароль") }}
+            {{ form.password.label(class="text-light") }}
+            {{ form.password(class="form-control bg-black", id="password", placeholder="Введіть пароль") }}
           </div>
 
           <div class="form-group text-center">
-            <input class="btn btn-success btn-block" type="submit" value="Go">
+            <input class="btn btn-success btn-block" type="submit" value="Зайти до облікового запису">
           </div>
         </form>
       </div>
-      <div class="card-footer text-center">
-        <small>Вже маєте обліковий запис? <a href="#">Увійти</a></small>
+      <div class="card-footer text-center bg-black">
+        <small class="text-light">У вас ще немає облікового запису?<a href="{{ url_for('register') }}" class="text-success"> Зареєструватись</a></small>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
