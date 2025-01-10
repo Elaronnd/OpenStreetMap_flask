@@ -1,10 +1,13 @@
 from os import urandom
-from flask import Flask, request, jsonify, abort, Response, render_template, flash, redirect
+from flask import Flask, request, jsonify, abort, Response, render_template, flash, redirect, url_for
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
-from app.forms import UserLoginForm, UserRegForm
+from app.forms import UserLoginForm, UserRegForm, ChangePasswordForm, NewPasswordForm
 from app.models import User, db
 from flask_bcrypt import Bcrypt
 from app.utils.map_generator import iframe_map
+from app.utils import send_checker_message
+from cryptography.fernet import Fernet
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///safemap.db'
@@ -15,6 +18,8 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
+key = Fernet.generate_key()
+fernet = Fernet(key)
 
 
 @login_manager.user_loader
@@ -78,6 +83,51 @@ async def login():
 @login_required
 async def profile():
     return render_template("profile.html", current_user=current_user)
+
+
+@app.route('/settings')
+@login_required
+async def settings():
+    return render_template('settings.html', current_user=current_user)
+
+
+@app.route('/change-password', methods=["GET", "POST"])
+@login_required
+async def change_password():
+    changeform = ChangePasswordForm()
+    if request.method == "GET":
+        return render_template('email_checker.html', form=changeform)
+    elif request.method == "POST":
+        if changeform.validate_on_submit():
+            username = changeform.username.data.lower()
+            user = User.query.filter_by(username=username).first()
+            email = changeform.email.data.lower()
+            if user and user.email == email:
+                msg = url_for('change_password_link', username=username,
+                              email=(fernet.encrypt(email.encode())).decode()
+                              )
+                # fernet.encrypt(data=bytes((changeform.new_password.data).encode()))
+                send_checker_message.send_msg(imsg=request.host + msg, email=email)
+                flash(f"Надіслано повідомлення на адресс {email}")
+                return redirect("/")
+            else:
+                flash(f"Не вдалося!")
+                return redirect("/")
+
+@app.route('/change-password-link/username=<username>email=&<email>', methods=["GET", "POST"])
+async def change_password_link(username, email):
+    user = User.query.filter_by(username=username).first()
+    email = fernet.decrypt(email).decode()
+    form = NewPasswordForm()
+    if request.method == "GET":
+        return render_template("new_password.html", form=form)
+    elif request.method == "POST":
+        if form.validate_on_submit():
+            if user and user.email == email:
+                password = form.new_password.data
+                user.password = bcrypt.generate_password_hash(password=password)
+                db.session.commit()
+                return redirect('/')
 
 
 @app.route('/logout', methods=["POST"])

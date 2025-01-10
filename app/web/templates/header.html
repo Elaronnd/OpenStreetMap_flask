@@ -20,7 +20,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user"></i> Profile</a>
-                        <a class="dropdown-item" href="#"><i class="fas fa-cogs"></i> Settings</a>
+                        <a class="dropdown-item" href="{{ url_for('settings') }}"><i class="fas fa-cogs"></i> Settings</a>
                         <form method="post" action="{{ url_for('logout') }}">
                             <button class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Log Out</button>
                         </form>

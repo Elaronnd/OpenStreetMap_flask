@@ -14,6 +14,3 @@ class User(db.Model, UserMixin):
     @staticmethod
     def get(user_id):
         return db.get_or_404(User, ident=user_id)
-
-
-

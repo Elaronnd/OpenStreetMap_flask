@@ -13,3 +13,11 @@ class UserLoginForm(FlaskForm):
     username = StringField(validators=[DataRequired()])
     password = PasswordField(validators=[DataRequired()])
 
+
+class ChangePasswordForm(FlaskForm):
+    username = StringField(validators=[DataRequired()])
+    email = EmailField(validators=[DataRequired()])
+
+
+class NewPasswordForm(FlaskForm):
+    new_password = PasswordField(validators=[DataRequired()])
