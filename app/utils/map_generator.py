@@ -38,7 +38,7 @@ async def iframe_map(
             icon=Icon(color="green")
         ).add_to(folium_map)
 
-        coordinates = geojson_data[1]['features'][0]['geometry']['coordinates']
+        coordinates = geojson_data[1].get('features')[0].get('geometry').get('coordinates')
         polygon = [Polygon(coordinate) for coordinate_set in coordinates for coordinate in coordinate_set][0]
         marker_point = Point(latitude, longitude)
 

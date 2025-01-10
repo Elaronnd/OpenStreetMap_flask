@@ -12,6 +12,8 @@ from cryptography.fernet import Fernet
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///safemap.db'
 app.config['SECRET_KEY'] = urandom(16)
+app.config['UPLOAD_FOLDER'] = "upload"
+app.config['ALLOWED_EXTENSIONS'] = {"geojson"}
 # maybe better to make secret key in .env file (?)
 # idk, maybe... but not .env since we have yaml
 db.init_app(app)
@@ -97,7 +99,7 @@ async def settings():
 async def change_password():
     changeform = ChangePasswordForm()
     if request.method == "GET":
-        return render_template('email_checker.html', form=changeform)
+        return render_template('email_checker.html', form=changeform, current_user=current_user)
     elif request.method == "POST":
         if changeform.validate_on_submit():
             username = changeform.username.data.lower()
@@ -123,7 +125,7 @@ async def change_password_link(token):
     user = User.query.filter_by(username=username).first()
     form = NewPasswordForm()
     if request.method == "GET":
-        return render_template("new_password.html", form=form)
+        return render_template("new_password.html", form=form, current_user=current_user)
     elif request.method == "POST":
         if form.validate_on_submit():
             if user and user.email == email:
@@ -155,6 +157,10 @@ async def draw():
         fixed_top=True
     )
 
+@app.route("/upload", methods=["GET", "POST"])
+async def upload():
+    if request.method == "GET":
+        return render_template("upload.html", current_user=current_user)
 
 @app.route("/")
 async def index():
