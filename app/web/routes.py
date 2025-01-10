@@ -70,6 +70,7 @@ async def login():
         if form.validate_on_submit():
             username = form.username.data.lower()
             user = User.query.filter_by(username=username).first()
+            print(user.password)
             if user and bcrypt.check_password_hash(user.password, form.password.data.lower()):
                 login_user(user)
                 return redirect("/")
@@ -108,7 +109,7 @@ async def change_password():
                               )
                 # fernet.encrypt(data=bytes((changeform.new_password.data).encode()))
                 send_checker_message.send_msg(imsg=request.host + msg, email=email)
-                flash(f"Надіслано повідомлення на адресс {email}")
+                flash(message=f"Надіслано повідомлення на адресс {email}", category="success")
                 return redirect("/")
             else:
                 flash(f"Не вдалося!")
@@ -126,8 +127,8 @@ async def change_password_link(token):
     elif request.method == "POST":
         if form.validate_on_submit():
             if user and user.email == email:
-                password = form.new_password.data
-                user.password = bcrypt.generate_password_hash(password=password)
+                password = form.new_password.data.lower()
+                user.password = bcrypt.generate_password_hash(password=password).decode('utf-8')
                 db.session.commit()
                 return redirect('/')
 

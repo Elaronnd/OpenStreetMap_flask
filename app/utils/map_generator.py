@@ -3,6 +3,7 @@ from folium.map import Marker, Icon, LayerControl
 from folium.features import GeoJson
 from folium.plugins import Draw
 from ipinfo import getHandlerAsync
+from shapely import Polygon, Point
 from app.config.read_config import ACCESS_TOKEN_IPINFO
 from app.utils.github_api import get_info_war
 from flask import current_app, flash
@@ -12,25 +13,6 @@ async def iframe_map(
         user_ip: str,
         draw: bool = False
 ):
-    # handler = getHandlerAsync(ACCESS_TOKEN_IPINFO)
-    # details = await handler.getDetails(ip_address=user_ip)
-    # try:
-    #     folium_map = Map(
-    #         location=[details.latitude, details.longitude],
-    #         zoom_start=6
-    #     )
-    #     Marker(
-    #         location=[details.latitude, details.longitude],
-    #         tooltip="Ваше місцезнаходження",
-    #         icon=Icon(color="green")
-    #     ).add_to(folium_map)
-    # except AttributeError:
-    #     flash(
-    #         message='Ми не змогли знайти інформацію про ваше місцезнаходження',
-    #         category='danger'
-    #     )
-    folium_map = Map()
-    folium_map.get_root().height = "94%"
     geojson_data = await get_info_war(
         repo_link="cyterat/deepstate-map-data",
         repo_path="data"
@@ -41,6 +23,44 @@ async def iframe_map(
                 message='Ми не змогли знайти інформацію про тимчасово окуповані території України',
                 category='danger'
             )
+
+    handler = getHandlerAsync(ACCESS_TOKEN_IPINFO)
+    details = await handler.getDetails(ip_address=user_ip)
+    try:
+        latitude, longitude = details.latitude, details.longitude
+        folium_map = Map(
+            location=[latitude, longitude],
+            zoom_start=6
+        )
+        Marker(
+            location=[details.latitude, details.longitude],
+            tooltip="Ваше місцезнаходження",
+            icon=Icon(color="green")
+        ).add_to(folium_map)
+
+        coordinates = geojson_data[1]['features'][0]['geometry']['coordinates']
+        polygon = [Polygon(coordinate) for coordinate_set in coordinates for coordinate in coordinate_set][0]
+        marker_point = Point(latitude, longitude)
+
+        if polygon.contains(marker_point):
+            with current_app.app_context():
+                flash(
+                    message='Ви у небезпечній зоні! Будьте обережні!',
+                    category='danger'
+                )
+        else:
+            with current_app.app_context():
+                flash(
+                    message='Ви не знаходитесь у небезпечній зоні!',
+                    category='success'
+                )
+    except AttributeError:
+        flash(
+            message='Ми не змогли знайти інформацію про ваше місцезнаходження',
+            category='danger'
+        )
+        folium_map = Map()
+    folium_map.get_root().height = "94%"
 
     GeoJson(
         geojson_data[1],
@@ -57,8 +77,8 @@ async def iframe_map(
         Draw(
             export=True,
             draw_options={
-                "polyline": True,
-                "polygon": False,
+                "polyline": False,
+                "polygon": True,
                 "circle": False,
                 "rectangle": False,
                 "marker": False,

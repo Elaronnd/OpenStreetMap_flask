@@ -1,4 +1,5 @@
 flask~=3.1.0
+flask[async]
 Flask-Login~=0.6.3
 Flask-Bcrypt~=1.0.1
 PyGithub~=2.5.0
@@ -7,3 +8,7 @@ folium~=0.19.4
 ipinfo~=5.1.1
 PyYAML~=6.0.2
 wtforms~=3.2.1
+flask_wtf
+flask_sqlalchemy
+python-dotenv
+shapely
