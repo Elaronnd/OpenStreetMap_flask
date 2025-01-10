@@ -102,9 +102,9 @@ async def change_password():
             username = changeform.username.data.lower()
             user = User.query.filter_by(username=username).first()
             email = changeform.email.data.lower()
+            token = fernet.encrypt(f"{username}:{email}".encode())
             if user and user.email == email:
-                msg = url_for('change_password_link', username=username,
-                              email=(fernet.encrypt(email.encode())).decode()
+                msg = url_for('change_password_link', token=token.decode()
                               )
                 # fernet.encrypt(data=bytes((changeform.new_password.data).encode()))
                 send_checker_message.send_msg(imsg=request.host + msg, email=email)
@@ -114,10 +114,12 @@ async def change_password():
                 flash(f"Не вдалося!")
                 return redirect("/")
 
-@app.route('/change-password-link/username=<username>email=&<email>', methods=["GET", "POST"])
-async def change_password_link(username, email):
+
+@app.route('/change-password-link/token=<token>', methods=["GET", "POST"])
+async def change_password_link(token):
+    decrypted_token = fernet.decrypt(token).decode()
+    username, email = decrypted_token.split(':')
     user = User.query.filter_by(username=username).first()
-    email = fernet.decrypt(email).decode()
     form = NewPasswordForm()
     if request.method == "GET":
         return render_template("new_password.html", form=form)
