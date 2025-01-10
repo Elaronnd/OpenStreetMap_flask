@@ -1,5 +1,5 @@
 from app.web.routes import app
-from app.models import User, db
+from app.models import User, Draws, db
 
 if __name__ == "__main__":
     with app.app_context():

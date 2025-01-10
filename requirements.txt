@@ -12,3 +12,5 @@ flask_wtf
 flask_sqlalchemy
 python-dotenv
 shapely
+geojson
+aiofiles

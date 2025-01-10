@@ -1,6 +1,6 @@
-from flask_wtf import FlaskForm, Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, EmailField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired
 from flask_wtf.file import FileField, FileAllowed
 
 
@@ -23,6 +23,9 @@ class ChangePasswordForm(FlaskForm):
 class NewPasswordForm(FlaskForm):
     new_password = PasswordField(validators=[DataRequired()])
 
+
 class UploadForm(FlaskForm):
-    file = FileField('Choose file', validators=[FileAllowed(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'], 'Тільки geojson')])
-    submit = SubmitField('Upload')
+    file = FileField('Choose file',
+                     validators=[FileAllowed(['geojson'], 'Тільки geojson')])
+    submit = SubmitField('Upload',
+                         render_kw={"class": "btn btn-primary"})
