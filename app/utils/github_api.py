@@ -7,7 +7,7 @@ from json import loads
 github = Github()
 
 
-@cached(ttl=10, serializer=PickleSerializer())
+@cached(ttl=7200, serializer=PickleSerializer())
 async def get_info_war(
         repo_link: str,
         repo_path: str
