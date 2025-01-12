@@ -1,23 +1,50 @@
-import os
-from os import urandom
-from flask import Flask, request, jsonify, abort, Response, render_template, flash, redirect, url_for
-from flask_login import login_user, LoginManager, login_required, logout_user, current_user
-from app.forms import UserLoginForm, UserRegForm, ChangePasswordForm, NewPasswordForm, UploadForm
-from app.models import User, db, Draws
+from os import (
+    listdir,
+    path
+)
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    abort,
+    Response,
+    render_template,
+    flash,
+    redirect,
+    url_for
+)
+from flask_login import (
+    login_user,
+    LoginManager,
+    login_required,
+    logout_user,
+    current_user
+)
+from app.forms import (
+    UserLoginForm,
+    UserRegForm,
+    ChangePasswordForm,
+    NewPasswordForm,
+    UploadForm
+)
+from app.models import (
+    User,
+    db,
+    Draws
+)
 from flask_bcrypt import Bcrypt
 from app.utils.map_generator import iframe_map, validate_geojson_with_schema
 from app.utils import send_checker_message
 from cryptography.fernet import Fernet
-from app.config.read_config import UPLOAD_FOLDER
-import uuid
+from app.config.read_config import UPLOAD_FOLDER, SECRET_KEY
+from uuid import uuid4
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///safemap.db'
-app.config['SECRET_KEY'] = urandom(16)
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {"geojson"}
-# maybe better to make secret key in .env file (?)
-# idk, maybe... but not .env since we have yaml
+
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -176,11 +203,11 @@ async def upload():
     filename = file_user.filename
     file_extension = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
 
-    ramdom_name = f"{uuid.uuid4()}.geojson"
-    all_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if
-                 os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f))]
+    ramdom_name = f"{uuid4()}.geojson"
+    all_files = [f for f in listdir(app.config['UPLOAD_FOLDER']) if
+                 path.isfile(path.join(app.config['UPLOAD_FOLDER'], f))]
     while ramdom_name in all_files:
-        ramdom_name = f"{uuid.uuid4()}.geojson"
+        ramdom_name = f"{uuid4()}.geojson"
 
     if file_extension not in app.config['ALLOWED_EXTENSIONS']:
         flash(message="Не дозволений формат файлу")
@@ -194,14 +221,12 @@ async def upload():
     user = Draws(filepath=filepath, user_id=current_user.id)
     db.session.add(user)
     db.session.commit()
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], ramdom_name)
-    with open(filepath, 'wb') as f:
-        f.write(file_content)
 
-    try:
-        return f"File content: <pre>{file_content}</pre>"
-    except Exception as e:
-        return f"Error reading file_user: {str(e)}"
+    flash(
+        message='Файл успішно завантажено на сервер!',
+        category='success'
+    )
+    return redirect(url_for("index"))
 
 
 @app.route("/")

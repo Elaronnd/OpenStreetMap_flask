@@ -11,6 +11,7 @@ wtforms~=3.2.1
 flask_wtf
 flask_sqlalchemy
 python-dotenv
-shapely
+shapely~=2.0.6
 geojson
-aiofiles
+aiofiles~=24.1.0
+cryptography~=44.0.0
