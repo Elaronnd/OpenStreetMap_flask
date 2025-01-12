@@ -1,3 +1,4 @@
+import os
 from os import (
     listdir,
     path
@@ -217,11 +218,14 @@ async def upload():
     filepath = app.config['UPLOAD_FOLDER'] + ramdom_name
     is_valid = await validate_geojson_with_schema(geojson_data=file_content)
     if is_valid[0] is False:
-        flash(message=f"Ми не змогли валідувати ваш файл {is_valid[1]}")
+        flash(message=f"Ми не змогли валідувати ваш файл")
         return redirect(url_for("upload"))
     user = Draws(filepath=filepath, user_id=current_user.id)
     db.session.add(user)
     db.session.commit()
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], ramdom_name)
+    with open(filepath, 'wb') as f:
+        f.write(file_content)
 
     flash(
         message='Файл успішно завантажено на сервер!',

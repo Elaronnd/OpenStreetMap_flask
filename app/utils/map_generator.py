@@ -23,7 +23,7 @@ class DangerZoneMap:
     async def get_user_location(self, user_ip: str) -> tuple:
         handler = getHandlerAsync(self.access_token)
         details = await handler.getDetails(ip_address=user_ip)
-        return details.longitude, details.latitude
+        return details.latitude, details.longitude
 
     async def process_user_files(self, marker_point: Point) -> list:
         all_files = [f for f in listdir(self.upload_folder) if path.isfile(path.join(self.upload_folder, f))]
@@ -83,12 +83,12 @@ async def iframe_map(user_ip: str, draw: bool = False):
         iframe = folium_map.get_root()._repr_html_()
         return [200, iframe]
 
-    longitude, latitude = await danger_zone_map.get_user_location(user_ip)
-    marker_point = Point(latitude, longitude)
-    folium_map = Map(location=[longitude, latitude], zoom_start=6)
+    latitude, longitude = await danger_zone_map.get_user_location(user_ip)
+    marker_point = Point(longitude, latitude)
+    folium_map = Map(location=[latitude, longitude], zoom_start=6)
 
     Marker(
-        [longitude, latitude],
+        [latitude, longitude],
         tooltip="Ваше місцезнаходження",
         icon=Icon(color="green")
     ).add_to(folium_map)
