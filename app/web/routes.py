@@ -171,6 +171,7 @@ async def logout():
 
 
 @app.route("/draw")
+@login_required
 async def draw():
     iframe = await iframe_map(
         request.remote_addr,
