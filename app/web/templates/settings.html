@@ -12,8 +12,6 @@
         <p class="card-text mb-4">Налаштування акаунту:</p>
         <div class="d-grid gap-3">
            <a class="btn btn-outline-success mb-3 py-2" href="{{ url_for('change_password') }}">Змінити пароль</a>
-          <a class="btn btn-outline-success mb-3 py-2" href="#">Змінити пошту</a>
-          <a class="btn btn-outline-danger mb-3 py-2" href="#">Видалити акаунт</a>
         </div>
         <hr class="bg-light my-4">
         <form action="{{ url_for('logout') }}" method="post">
