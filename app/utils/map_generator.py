@@ -40,7 +40,7 @@ class DangerZoneMap:
                     geojson_data=feature,
                     coordinates=feature.get('geometry').get('coordinates')
                 )
-                if in_danger_zone[1] is True:
+                if in_danger_zone[0] is True:
                     is_danger = True
         return [is_danger, users_data]
 
@@ -109,7 +109,7 @@ async def iframe_map(user_ip: str, draw: bool = False):
             }
         ).add_to(folium_map)
         in_danger_zone = await danger_zone_map.check_danger_zone(marker_point, geojson_data[1])
-        if in_danger_zone[0] or user_in_danger[0]:
+        if in_danger_zone[0] is True or user_in_danger[0] is True:
             with current_app.app_context():
                 flash('Ви у небезпечній зоні! Будьте обережні!', 'danger')
         else:
